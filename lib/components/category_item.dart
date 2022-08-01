@@ -12,7 +12,7 @@ class CategoryItem extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) {
-          return CategoriesMealsScreen();
+          return CategoriesMealsScreen(category);
         },
       ),
     );
@@ -23,7 +23,7 @@ class CategoryItem extends StatelessWidget {
     return InkWell(
       onTap: () => _selectCategory(context),
       borderRadius: BorderRadius.circular(15),
-      splashColor: Theme.of(context).primaryColor,
+      splashColor: Theme.of(context).colorScheme.primary,
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
