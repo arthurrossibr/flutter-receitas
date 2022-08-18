@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '/data/dummy_data.dart';
 import '/models/filters.dart';
 import '/screens/categories_meals_screen.dart';
@@ -6,7 +7,6 @@ import '/screens/meal_detail_screen.dart';
 import '/screens/settings_screen.dart';
 import '/screens/tabs_screen.dart';
 import '/utils/app_routes.dart';
-
 import 'models/meal.dart';
 
 void main() {
@@ -26,8 +26,9 @@ class _MyAppState extends State<MyApp> {
   Filters filters = Filters();
 
   List<Meal> _availableMeals = DUMMY_MEALS;
+  List<Meal> _favoriteMeals = [];
 
-  void _filterMeals (Filters filters) {
+  void _filterMeals(Filters filters) {
     setState(() {
       this.filters = filters;
 
@@ -36,9 +37,24 @@ class _MyAppState extends State<MyApp> {
         final filterLactose = filters.isLactoseFree && !meal.isLactoseFree;
         final filterVegan = filters.isVegan && !meal.isVegan;
         final filterVegetarian = filters.isVegetarian && !meal.isVegetarian;
-        return !filterGluten && !filterLactose && !filterVegan && !filterVegetarian;
+        return !filterGluten &&
+            !filterLactose &&
+            !filterVegan &&
+            !filterVegetarian;
       }).toList();
     });
+  }
+
+  void _toggleFavorite(Meal meal) {
+    setState(() {
+      _favoriteMeals.contains(meal)
+          ? _favoriteMeals.remove(meal)
+          : _favoriteMeals.add(meal);
+    });
+  }
+
+  bool _isFavorite(Meal meal){
+    return _favoriteMeals.contains(meal);
   }
 
   @override
@@ -60,9 +76,10 @@ class _MyAppState extends State<MyApp> {
             ),
       ),
       routes: {
-        AppRoutes.HOME: (ctx) => const TabsScreen(),
-        AppRoutes.CATEGORIES_MEALS: (ctx) => CategoriesMealsScreen(_availableMeals),
-        AppRoutes.MEAL_DETAIL: (ctx) => const MealDetailScreen(),
+        AppRoutes.HOME: (ctx) => TabsScreen(_favoriteMeals),
+        AppRoutes.CATEGORIES_MEALS: (ctx) =>
+            CategoriesMealsScreen(_availableMeals),
+        AppRoutes.MEAL_DETAIL: (ctx) => MealDetailScreen(_toggleFavorite, _isFavorite),
         AppRoutes.SETTINGS: (ctx) => SettingsScreen(_filterMeals, filters),
       },
     );
