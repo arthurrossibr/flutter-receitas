@@ -1,23 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_refeicoes/data/dummy_data.dart';
-import 'package:projeto_refeicoes/screens/categories_meals_screen.dart';
-import 'package:projeto_refeicoes/screens/meal_detail_screen.dart';
-import 'package:projeto_refeicoes/screens/settings_screen.dart';
-import 'package:projeto_refeicoes/screens/tabs_screen.dart';
-import 'package:projeto_refeicoes/utils/app_routes.dart';
+import '/data/dummy_data.dart';
+import '/models/filters.dart';
+import '/screens/categories_meals_screen.dart';
+import '/screens/meal_detail_screen.dart';
+import '/screens/settings_screen.dart';
+import '/screens/tabs_screen.dart';
+import '/utils/app_routes.dart';
 
 import 'models/meal.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final ThemeData theme = ThemeData();
 
-  final List<Meal> _availableMeals = DUMMY_MEALS;
+  Filters filters = Filters();
+
+  List<Meal> _availableMeals = DUMMY_MEALS;
+
+  void _filterMeals (Filters filters) {
+    setState(() {
+      this.filters = filters;
+
+      _availableMeals = DUMMY_MEALS.where((meal) {
+        final filterGluten = filters.isGlutenFree && !meal.isGlutenFree;
+        final filterLactose = filters.isLactoseFree && !meal.isLactoseFree;
+        final filterVegan = filters.isVegan && !meal.isVegan;
+        final filterVegetarian = filters.isVegetarian && !meal.isVegetarian;
+        return !filterGluten && !filterLactose && !filterVegan && !filterVegetarian;
+      }).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +63,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.HOME: (ctx) => const TabsScreen(),
         AppRoutes.CATEGORIES_MEALS: (ctx) => CategoriesMealsScreen(_availableMeals),
         AppRoutes.MEAL_DETAIL: (ctx) => const MealDetailScreen(),
-        AppRoutes.SETTINGS: (ctx) => const SettingsScreen(),
+        AppRoutes.SETTINGS: (ctx) => SettingsScreen(_filterMeals, filters),
       },
     );
   }

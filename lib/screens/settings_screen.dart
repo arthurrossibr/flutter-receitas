@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_refeicoes/components/main_drawer.dart';
 
+import '../components/main_drawer.dart';
 import '../models/filters.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen( this.onSettingschanged, this.filters, {Key? key})
+      : super(key: key);
+
+  final Filters filters;
+  final Function(Filters) onSettingschanged;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  var filters = Filters();
+  late Filters filters;
+
+  void initState() {
+    super.initState();
+    filters = widget.filters;
+  }
 
   Widget _createSwitch(
     String title,
@@ -23,7 +32,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: Text(title),
       subtitle: Text(subtitle),
       value: value,
-      onChanged: onChanged,
+      onChanged: (value) {
+        onChanged(value);
+        widget.onSettingschanged(filters);
+      },
     );
   }
 
